@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/sotowang/sunotoapi/cfg"
 	"github.com/sotowang/sunotoapi/serve"
 )
 
@@ -17,9 +18,9 @@ func CreateTask() fiber.Handler {
 		var body []byte
 		var err error
 		if c.Path() == "/v2/generate" {
-			body, err = serve.V2Generate(data)
+			body, err = serve.V2Generate(data, cfg.Config.App.Client)
 		} else if c.Path() == "/v2/lyrics/create" {
-			body, err = serve.GenerateLyrics(data)
+			body, err = serve.GenerateLyrics(data, cfg.Config.App.Client)
 		}
 		if err != nil {
 			return c.Status(fiber.StatusOK).SendString(err.Error())
@@ -44,9 +45,9 @@ func GetTask() fiber.Handler {
 		var body []byte
 		var err error
 		if c.Path() == "/v2/feed" {
-			body, err = serve.V2GetFeedTask(data["ids"])
+			body, err = serve.V2GetFeedTask(data["ids"], cfg.Config.App.Client)
 		} else if c.Path() == "/v2/lyrics/task" {
-			body, err = serve.GetLyricsTask(data["ids"])
+			body, err = serve.GetLyricsTask(data["ids"], cfg.Config.App.Client)
 		}
 		if err != nil {
 			return c.Status(fiber.StatusOK).SendString(err.Error())

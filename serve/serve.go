@@ -87,8 +87,8 @@ func GetJwtToken(clientSession string) (string, error) {
 	return data.Jwt, nil
 }
 
-func sendRequest(url, method string, data []byte) ([]byte, error) {
-	jwt, err := IsJWTExpired(cfg.Config.App.Client)
+func sendRequest(url, method, clientSession string, data []byte) ([]byte, error) {
+	jwt, err := IsJWTExpired(clientSession)
 	if err != nil {
 		log.Println("Error getting JWT: ", err)
 		return nil, err
@@ -120,47 +120,47 @@ func sendRequest(url, method string, data []byte) ([]byte, error) {
 	return body, nil
 }
 
-func V2Generate(d map[string]interface{}) ([]byte, error) {
+func V2Generate(d map[string]interface{}, clientSession string) ([]byte, error) {
 	_url := "https://studio-api.suno.ai/api/generate/v2/"
 	jsonData, err := json.Marshal(d)
 	if err != nil {
 		log.Fatalf("Error marshalling request data: %v", err)
 		return nil, err
 	}
-	body, err := sendRequest(_url, "POST", jsonData)
+	body, err := sendRequest(_url, "POST", clientSession, jsonData)
 	if err != nil {
 		return nil, err
 	}
 	return body, nil
 }
 
-func V2GetFeedTask(ids string) ([]byte, error) {
+func V2GetFeedTask(ids, clientSession string) ([]byte, error) {
 	ids = url.QueryEscape(ids)
 	_url := "https://studio-api.suno.ai/api/feed/?ids=" + ids
-	body, err := sendRequest(_url, "GET", nil)
+	body, err := sendRequest(_url, "GET", clientSession, nil)
 	if err != nil {
 		return nil, err
 	}
 	return body, nil
 }
 
-func GenerateLyrics(d map[string]interface{}) ([]byte, error) {
+func GenerateLyrics(d map[string]interface{}, clientSession string) ([]byte, error) {
 	_url := "https://studio-api.suno.ai/api/generate/lyrics/"
 	jsonData, err := json.Marshal(d)
 	if err != nil {
 		log.Fatalf("Error marshalling request data: %v", err)
 		return nil, err
 	}
-	body, err := sendRequest(_url, "POST", jsonData)
+	body, err := sendRequest(_url, "POST", clientSession, jsonData)
 	if err != nil {
 		return nil, err
 	}
 	return body, nil
 }
 
-func GetLyricsTask(ids string) ([]byte, error) {
+func GetLyricsTask(ids, clientSession string) ([]byte, error) {
 	_url := "https://studio-api.suno.ai/api/generate/lyrics/" + ids
-	body, err := sendRequest(_url, "GET", nil)
+	body, err := sendRequest(_url, "GET", clientSession, nil)
 	if err != nil {
 		return nil, err
 	}
