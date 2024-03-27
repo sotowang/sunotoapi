@@ -1,4 +1,4 @@
-module fksunoapi
+module sunotoapi
 
 go 1.20
 
