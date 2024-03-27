@@ -15,9 +15,9 @@ type Claims struct {
 
 var Jwt string
 
-func IsJWTExpired() (Jwt string, err error) {
+func IsJWTExpired(clientSession string) (Jwt string, err error) {
 	if Jwt == "" {
-		Jwt, err = GetJwtToken()
+		Jwt, err = GetJwtToken(clientSession)
 		return
 	}
 	parts := strings.Split(Jwt, ".")
@@ -37,7 +37,7 @@ func IsJWTExpired() (Jwt string, err error) {
 	}
 	expTime := time.Unix(claims.Exp, 0)
 	if time.Now().After(expTime) {
-		Jwt, err = GetJwtToken()
+		Jwt, err = GetJwtToken(clientSession)
 		return
 	}
 	return Jwt, nil

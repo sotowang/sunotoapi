@@ -1,6 +1,6 @@
 module fksunoapi
 
-go 1.21
+go 1.20
 
 require (
 	github.com/gofiber/fiber/v2 v2.52.3

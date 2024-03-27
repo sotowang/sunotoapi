@@ -18,13 +18,13 @@ var (
 	Session    string
 )
 
-func GetSession() string {
+func GetSession(clientSession string) string {
 	_url := "https://clerk.suno.ai/v1/client?_clerk_js_version=4.70.5"
 	method := "GET"
 	client := &http.Client{}
 	req, err := http.NewRequest(method, _url, nil)
 	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36")
-	req.Header.Add("Cookie", "__client="+cfg.Config.App.Client)
+	req.Header.Add("Cookie", "__client="+clientSession)
 	res, err := client.Do(req)
 	if err != nil {
 		log.Print(err)
@@ -45,9 +45,9 @@ func GetSession() string {
 	return data.Response.Sessions[0].Id
 }
 
-func GetJwtToken() (string, error) {
+func GetJwtToken(clientSession string) (string, error) {
 	if time.Now().After(time.Unix(SessionExp, 0)) {
-		Session = GetSession()
+		Session = GetSession(clientSession)
 	}
 	_url := fmt.Sprintf("https://clerk.suno.ai/v1/client/sessions/%s/tokens?_clerk_js_version=4.70.5", Session)
 	method := "POST"
@@ -88,7 +88,7 @@ func GetJwtToken() (string, error) {
 }
 
 func sendRequest(url, method string, data []byte) ([]byte, error) {
-	jwt, err := IsJWTExpired()
+	jwt, err := IsJWTExpired(cfg.Config.App.Client)
 	if err != nil {
 		log.Println("Error getting JWT: ", err)
 		return nil, err
