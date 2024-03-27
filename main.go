@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fksunoapi/cfg"
-	"fksunoapi/router"
-	"fksunoapi/serve"
 	"github.com/gofiber/fiber/v2"
+	"github.com/sotowang/sunotoapi/cfg"
+	"github.com/sotowang/sunotoapi/router"
+	"github.com/sotowang/sunotoapi/serve"
 )
 
 func init() {

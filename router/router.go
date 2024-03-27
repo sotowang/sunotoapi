@@ -1,9 +1,9 @@
 package router
 
 import (
-	"fksunoapi/serve"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/sotowang/sunotoapi/serve"
 )
 
 func CreateTask() fiber.Handler {

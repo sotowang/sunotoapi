@@ -3,9 +3,9 @@ package serve
 import (
 	"bytes"
 	"encoding/json"
-	"fksunoapi/cfg"
-	"fksunoapi/models"
 	"fmt"
+	"github.com/sotowang/sunotoapi/cfg"
+	"github.com/sotowang/sunotoapi/models"
 	"io"
 	"log"
 	"net/http"

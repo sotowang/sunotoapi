@@ -1,7 +1,7 @@
 package cfg
 
 import (
-	"fksunoapi/models"
+	"github.com/sotowang/sunotoapi/models"
 	"github.com/spf13/viper"
 	"log"
 )
