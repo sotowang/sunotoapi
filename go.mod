@@ -1,4 +1,4 @@
-module sunotoapi
+module github.com/sotowang/sunotoapi
 
 go 1.20
 
