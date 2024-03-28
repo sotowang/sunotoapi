@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/sotowang/sunotoapi/cfg"
 	"github.com/sotowang/sunotoapi/models"
 	"io"
 	"log"
@@ -60,7 +59,7 @@ func GetJwtToken(clientSession string) (string, error) {
 		return "", err
 	}
 	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36")
-	req.Header.Add("Cookie", "__client="+cfg.Config.App.Client)
+	req.Header.Add("Cookie", "__client="+clientSession)
 
 	res, err := client.Do(req)
 	if err != nil {
