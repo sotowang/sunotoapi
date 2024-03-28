@@ -3,12 +3,14 @@ package serve
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/sotowang/sunotoapi/models"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 )
 
@@ -164,4 +166,94 @@ func GetLyricsTask(ids, clientSession string) ([]byte, error) {
 		return nil, err
 	}
 	return body, nil
+}
+
+func SunoChat(c map[string]interface{}, clientSession string) (interface{}, error) {
+	lastUserContent := getLastUserContent(c)
+	d := map[string]interface{}{
+		"mv":                     c["model"].(string),
+		"gpt_description_prompt": lastUserContent,
+		"prompt":                 "",
+		"make_instrumental":      false,
+	}
+	body, err := V2Generate(d, clientSession)
+	var v2GenerateData models.GenerateData
+	if err = json.Unmarshal(body, &v2GenerateData); err != nil {
+		log.Print(err)
+		return nil, err
+	}
+
+	clipIds := make([]string, len(v2GenerateData.Clips))
+	for i, clip := range v2GenerateData.Clips {
+		clipIds[i] = clip.Id
+	}
+	ids := strings.Join(clipIds, ",")
+
+	timeout := time.After(3 * time.Minute)
+	tick := time.Tick(5 * time.Second)
+
+	for {
+		select {
+		case <-timeout:
+			return nil, errors.New("timeout exceeded")
+		case <-tick:
+			body, err = V2GetFeedTask(ids, clientSession)
+			if err != nil {
+				return nil, err
+			}
+
+			var v2GetFeedData []map[string]interface{}
+			if err = json.Unmarshal(body, &v2GetFeedData); err != nil {
+				log.Print(err)
+				return nil, err
+			}
+
+			allComplete := true
+			for _, data := range v2GetFeedData {
+				if data["status"] != "complete" {
+					allComplete = false
+					break
+				}
+			}
+
+			if allComplete {
+				var markdown strings.Builder
+				markdown.WriteString(fmt.Sprintf("# %s\n\n", v2GetFeedData[0]["title"]))
+				markdown.WriteString(fmt.Sprintf("%s\n\n", v2GetFeedData[0]["metadata"].(map[string]interface{})["prompt"]))
+				markdown.WriteString(fmt.Sprintf("## 版本一\n\n"))
+				markdown.WriteString(fmt.Sprintf("视频链接：%s\n\n", v2GetFeedData[0]["video_url"]))
+				markdown.WriteString(fmt.Sprintf("音频链接：%s\n\n", v2GetFeedData[0]["audio_url"]))
+				markdown.WriteString(fmt.Sprintf("图片链接：%s\n\n", v2GetFeedData[0]["image_large_url"]))
+				markdown.WriteString(fmt.Sprintf("## 版本二\n\n"))
+				markdown.WriteString(fmt.Sprintf("视频链接：%s\n\n", v2GetFeedData[1]["video_url"]))
+				markdown.WriteString(fmt.Sprintf("音频链接：%s\n\n", v2GetFeedData[1]["audio_url"]))
+				markdown.WriteString(fmt.Sprintf("图片链接：%s\n\n", v2GetFeedData[1]["image_large_url"]))
+
+				response := map[string]interface{}{
+					"choices": []map[string]interface{}{
+						{
+							"finish_reason": "stop",
+							"index":         0,
+							"message": map[string]string{
+								"content": markdown.String(),
+								"role":    "assistant",
+							},
+							"logprobs": nil,
+						},
+					},
+					"created": time.Now().Unix(),
+					"id":      "chatcmpl-7QyqpwdfhqwajicIEznoc6Q47XAyW",
+					"model":   c["model"].(string),
+					"object":  "chat.completion",
+					"usage": map[string]int{
+						"completion_tokens": 17,
+						"prompt_tokens":     57,
+						"total_tokens":      74,
+					},
+				}
+
+				return response, nil
+			}
+		}
+	}
 }

@@ -15,6 +15,33 @@ type Claims struct {
 
 var Jwt string
 
+func getLastUserContent(data map[string]interface{}) string {
+	var lastUserContent string
+	messages, ok := data["messages"].([]interface{})
+	if !ok {
+		return lastUserContent
+	}
+
+	for i := len(messages) - 1; i >= 0; i-- {
+		message, ok := messages[i].(map[string]interface{})
+		if !ok {
+			continue
+		}
+
+		role, ok := message["role"].(string)
+		if !ok {
+			continue
+		}
+
+		if role == "user" {
+			lastUserContent, _ = message["content"].(string)
+			break
+		}
+	}
+
+	return lastUserContent
+}
+
 func IsJWTExpired(clientSession string) (Jwt string, err error) {
 	if Jwt == "" {
 		Jwt, err = GetJwtToken(clientSession)
