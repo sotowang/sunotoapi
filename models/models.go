@@ -7,7 +7,8 @@ type Config struct {
 		Port string `yaml:"Port"`
 	} `yaml:"Server"`
 	App struct {
-		Client string `yaml:"Client"`
+		Client  string `yaml:"Client"`
+		Version string `yaml:"Version"`
 	}
 }
 

@@ -9,7 +9,7 @@ import (
 
 func init() {
 	cfg.ConfigInit()
-	serve.Session = serve.GetSession(cfg.Config.App.Client)
+	serve.Session = serve.GetSession(cfg.Config.App.Client, cfg.Config.App.Version)
 }
 
 func main() {

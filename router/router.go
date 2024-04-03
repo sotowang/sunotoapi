@@ -20,13 +20,14 @@ func CreateTask() fiber.Handler {
 		} else {
 			ck = serve.ParseToken(ck)
 		}
-		serve.Session = serve.GetSession(ck)
+		version := cfg.Config.App.Version
+		serve.Session = serve.GetSession(ck, version)
 		var body []byte
 		var errResp *serve.ErrorResponse
 		if c.Path() == "/v2/generate" {
-			body, errResp = serve.V2Generate(data, ck)
+			body, errResp = serve.V2Generate(data, ck, version)
 		} else if c.Path() == "/v2/lyrics/create" {
-			body, errResp = serve.GenerateLyrics(data, ck)
+			body, errResp = serve.GenerateLyrics(data, ck, version)
 		}
 		if errResp != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(errResp)
@@ -51,13 +52,14 @@ func GetTask() fiber.Handler {
 		} else {
 			ck = serve.ParseToken(ck)
 		}
-		serve.Session = serve.GetSession(ck)
+		version := cfg.Config.App.Version
+		serve.Session = serve.GetSession(ck, cfg.Config.App.Version)
 		var body []byte
 		var errResp *serve.ErrorResponse
 		if c.Path() == "/v2/feed" {
-			body, errResp = serve.V2GetFeedTask(data["ids"], ck)
+			body, errResp = serve.V2GetFeedTask(data["ids"], ck, version)
 		} else if c.Path() == "/v2/lyrics/task" {
-			body, errResp = serve.GetLyricsTask(data["ids"], ck)
+			body, errResp = serve.GetLyricsTask(data["ids"], ck, version)
 		}
 		if errResp != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(errResp)
@@ -78,8 +80,9 @@ func SunoChat() fiber.Handler {
 		} else {
 			ck = serve.ParseToken(ck)
 		}
-		serve.Session = serve.GetSession(ck)
-		res, errResp := serve.SunoChat(data, ck)
+		version := cfg.Config.App.Version
+		serve.Session = serve.GetSession(ck, version)
+		res, errResp := serve.SunoChat(data, ck, version)
 		if errResp != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(errResp)
 		}
