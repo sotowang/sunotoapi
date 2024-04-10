@@ -159,7 +159,7 @@ func sendRequest(url, method, c, version string, data []byte) ([]byte, *ErrorRes
 }
 
 func V2Generate(d map[string]interface{}, c, version string) ([]byte, *ErrorResponse) {
-	_url := "https://studio-api.suno.com/api/generate/v2/"
+	_url := "https://studio-api.suno.ai/api/generate/v2/"
 	jsonData, err := json.Marshal(d)
 	if err != nil {
 		log.Printf("V2Generate failed, error marshalling request data: %v", err)
@@ -174,7 +174,7 @@ func V2Generate(d map[string]interface{}, c, version string) ([]byte, *ErrorResp
 
 func V2GetFeedTask(ids, c, version string) ([]byte, *ErrorResponse) {
 	ids = url.QueryEscape(ids)
-	_url := "https://studio-api.suno.com/api/feed/?ids=" + ids
+	_url := "https://studio-api.suno.ai/api/feed/?ids=" + ids
 	body, errResp := sendRequest(_url, "GET", c, version, nil)
 	if errResp != nil {
 		return body, errResp
